@@ -1,5 +1,6 @@
 import pandas as pd
 from dateutil.parser import parse
+import re
 
 def load_all_lists() -> pd.DataFrame:
     csv1 = pd.read_csv("lists/Beneficiarios 12 mar.csv")
@@ -30,7 +31,7 @@ def load_all_lists() -> pd.DataFrame:
     df_total["DATE"] = df_total["DATE"].apply(parse_fecha)
     df_total["DATE"] = df_total["DATE"].dt.date
     df_total["PHONE"] = df_total["PHONE"].apply(limpiar_telefono)
-    df_total["STATUS"] = df_total["PHONE"].apply(lambda x: "válido" if x.isdigit() and len(x) == 10 else "inválido")
+    df_total["STATUS"] = df_total["PHONE"].apply(telefono_valido)
 
     return df_total
 
@@ -51,3 +52,8 @@ def limpiar_telefono(cel):
     if cel.endswith(".0"):
         cel = cel[:-2]
     return cel
+
+def telefono_valido(cel):
+    cel = str(cel).strip()
+    cel = re.sub(r"\D", "", cel)
+    return "válido" if len(cel) == 10 else "inválido"
