@@ -2,8 +2,8 @@ import streamlit as st
 
 from utils.load_data import load_data
 from utils.lists import load_all_lists
-from utils.metrics import met_categoria, met_mensajes_dias, met_totales, met_insights, costo_acumulado, costo_diario
-from utils.lists_metrics import met_listas_dias, met_listas_programas, met_listas_totales, met_lists_insights, heatmap_programa_fecha, contactos_unicos_por_programa, graficar_plantillas
+from utils.metrics import graph_category, graph_messages_days, met_total, met_insights, graph_cost_summary, graph_cost_day
+from utils.lists_metrics import graph_lists_days, graph_lists_programs, met_lists_total, met_lists_insights, graph_lists_program_date, graph_lists_only_users_messages, graph_lists_templates
 
 st.set_page_config(layout="wide")
 
@@ -14,40 +14,40 @@ modo = st.segmented_control("Selecciona la fuente de datos:", ["Meta Dashboard",
 if modo == "Meta Dashboard":
     df = load_data("DataClean.csv")
     st.markdown("<h2 style='text-align: center;'>Resumen General</h2>", unsafe_allow_html=True)
-    met_totales(df)
+    met_total(df)
     met_insights(df)
     st.divider()
 
     st.markdown("<h3 style='text-align: center;'>Mensajes por plantilla</h3>", unsafe_allow_html=True)
-    met_categoria(df)
+    graph_category(df)
 
     st.markdown("<h3 style='text-align: center;'>Mensajes por día</h3>", unsafe_allow_html=True)
-    met_mensajes_dias(df)
+    graph_messages_days(df)
 
     st.markdown("<h3 style='text-align: center;'>Costo Acumulado</h3>", unsafe_allow_html=True)
-    costo_acumulado(df)
+    graph_cost_summary(df)
 
     st.markdown("<h3 style='text-align: center;'>Costo Diario</h3>", unsafe_allow_html=True)
-    costo_diario(df)
+    graph_cost_day(df)
 
 elif modo == "Listas de distribución":
     df = load_all_lists()
 
     st.markdown("<h2 style='text-align: center;'>Resumen de Listas de Distribución</h2>", unsafe_allow_html=True)
 
-    met_listas_totales(df)
+    met_lists_total(df)
     met_lists_insights(df)
     st.divider()
 
     st.markdown("<h3 style='text-align: center;'>Mensajes por Programas</h3>", unsafe_allow_html=True)
-    met_listas_programas(df)
+    graph_lists_programs(df)
     st.markdown("<h3 style='text-align: center;'>Mensajes por Días</h3>", unsafe_allow_html=True)
-    met_listas_dias(df)
+    graph_lists_days(df)
     st.markdown("<h3 style='text-align: center;'>Plantillas más usadas</h3>", unsafe_allow_html=True)
-    graficar_plantillas(df)
+    graph_lists_templates(df)
     st.markdown("<h3 style='text-align: center;'>Mensajes por Programas y Días</h3>", unsafe_allow_html=True)
-    heatmap_programa_fecha(df)
+    graph_lists_program_date(df)
     st.markdown("<h3 style='text-align: center;'>Contactos Únicos por Programa</h3>", unsafe_allow_html=True)
-    contactos_unicos_por_programa(df)
+    graph_lists_only_users_messages(df)
 
 

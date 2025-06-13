@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-def met_listas_totales(df: pd.DataFrame):
+def met_lists_total(df: pd.DataFrame):
     total = len(df)
     validos_df = df[df["STATUS"] == "válido"]
     errores = total - len(validos_df)
@@ -13,50 +13,51 @@ def met_listas_totales(df: pd.DataFrame):
     col3.metric("Errores (inválidos)", f"{errores:,}")
     col4.metric("Programas distintos", validos_df["PROGRAM"].nunique())
 
-def met_listas_programas(df: pd.DataFrame):
-    df = df[df["STATUS"] == "válido"]
-    resumen = df["PROGRAM"].value_counts().reset_index()
-    resumen.columns = ["PROGRAM", "Cantidad"]
-    fig = px.bar(resumen, x="Cantidad", y="PROGRAM", orientation="h")
-    st.plotly_chart(fig, use_container_width=True)
-
-def met_listas_dias(df: pd.DataFrame):
-    df = df[df["STATUS"] == "válido"]
-    resumen = df.groupby("DATE").size().reset_index(name="envíos")
-    fig = px.line(resumen, x="DATE", y="envíos")
-    st.plotly_chart(fig, use_container_width=True)
-
 def met_lists_insights(df: pd.DataFrame):
     df = df[df["STATUS"] == "válido"]
 
     col1, col2, col3, col4 = st.columns(4)
-
     promedio_dia = len(df) / df["DATE"].nunique()
+    programa_top = df["PROGRAM"].mode()[0]
+    dia_top = pd.to_datetime(df["DATE"].value_counts().idxmax())
+    plantilla_top = df["TEMPLATE"].mode()[0]
+
     col1.metric("Promedio por día", f"{promedio_dia:,.1f}")
-
-    programa_top = df["PROGRAM"].mode()[0] if not df["PROGRAM"].mode().empty else "—"
     col2.metric("Programa más enviado", programa_top)
+    col3.metric("Día más activo", dia_top.strftime("%d/%m/%Y"))
+    col4.metric("Plantilla más usada", plantilla_top)
 
-    dia_top = df["DATE"].value_counts().idxmax()
-    col3.metric("Día más activo", dia_top.strftime("%d %b %Y"))
-
-    col4.metric("Plantilla más usada", df["TEMPLATE"].mode()[0])
-
-def heatmap_programa_fecha(df: pd.DataFrame):
+def graph_lists_programs(df: pd.DataFrame):
     df = df[df["STATUS"] == "válido"]
-    resumen = df.groupby(["DATE", "PROGRAM"]).size().reset_index(name="envíos")
-    fig = px.density_heatmap(resumen, x="DATE", y="PROGRAM", z="envíos", nbinsx=20)
+    graph = df["PROGRAM"].value_counts().reset_index()
+    graph.columns = ["Programa", "Cantidad"]
+    fig = px.bar(graph, x="Cantidad", y="Programa", orientation="h")
     st.plotly_chart(fig, use_container_width=True)
 
-def contactos_unicos_por_programa(df: pd.DataFrame):
+def graph_lists_days(df: pd.DataFrame):
     df = df[df["STATUS"] == "válido"]
-    resumen = df.groupby("PROGRAM")["PHONE"].nunique().reset_index(name="Contactos únicos")
-    fig = px.bar(resumen, x="PROGRAM", y="Contactos únicos")
+    graph = df.groupby("DATE").size().reset_index(name="Mensajes")
+    graph.columns = ["Fecha", "Mensajes"]
+    fig = px.line(graph, x="Fecha", y="Mensajes")
     st.plotly_chart(fig, use_container_width=True)
 
-def graficar_plantillas(df: pd.DataFrame):
+def graph_lists_templates(df: pd.DataFrame):
     df = df[(df["STATUS"] == "válido") & (df["TEMPLATE"].notna())]
-    resumen = df["TEMPLATE"].value_counts().reset_index()
-    resumen.columns = ["TEMPLATE", "Cantidad"]
-    fig = px.pie(resumen, names="TEMPLATE", values="Cantidad", hole=0.3)
+    graph = df["TEMPLATE"].value_counts().reset_index()
+    graph.columns = ["TEMPLATE", "Cantidad"]
+    fig = px.pie(graph, names="TEMPLATE", values="Cantidad", hole=0.4)
+    st.plotly_chart(fig, use_container_width=True)
+
+def graph_lists_program_date(df: pd.DataFrame):
+    df = df[df["STATUS"] == "válido"]
+    graph = df.groupby(["DATE", "PROGRAM"]).size().reset_index()
+    graph.columns = ["Fecha", "Programa", "Mensajes"]
+    fig = px.density_heatmap(graph, x="Fecha", y="Programa", z="Mensajes", nbinsx=20)
+    st.plotly_chart(fig, use_container_width=True)
+
+def graph_lists_only_users_messages(df: pd.DataFrame):
+    df = df[df["STATUS"] == "válido"]
+    graph = df.groupby("PROGRAM")["PHONE"].nunique().reset_index()
+    graph.columns = ["Programa", "Números Únicos"]
+    fig = px.bar(graph, x="Programa", y="Números Únicos")
     st.plotly_chart(fig, use_container_width=True)
