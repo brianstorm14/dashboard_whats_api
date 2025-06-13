@@ -1,21 +1,17 @@
 import streamlit as st
+
 from utils.load_data import load_data
 from utils.lists import load_all_lists
 from utils.metrics import met_categoria, met_mensajes_dias, met_totales, met_insights, costo_acumulado, costo_diario
-from utils.lists_metrics import met_listas_dias, met_listas_programas, met_listas_totales, met_lists_insights, heatmap_programa_fecha, contactos_unicos_por_programa
+from utils.lists_metrics import met_listas_dias, met_listas_programas, met_listas_totales, met_lists_insights, heatmap_programa_fecha, contactos_unicos_por_programa, graficar_plantillas
 
-st.set_page_config(
-    layout="wide"
-)
+st.set_page_config(layout="wide")
 
 st.markdown("<h1 style='text-align: center;'>Dashboard de Mensajes por WhatsApp API</h1>", unsafe_allow_html=True)
 
-modo = st.segmented_control(
-    "Selecciona la fuente de datos:",
-    ["Meta (API de WhatsApp)", "Listas de distribución"]
-)
+modo = st.segmented_control("Selecciona la fuente de datos:", ["Meta Dashboard", "Listas de distribución"])
 
-if modo == "Meta Dashboard (API de WhatsApp)":
+if modo == "Meta Dashboard":
     df = load_data("DataClean.csv")
     st.markdown("<h2 style='text-align: center;'>Resumen General</h2>", unsafe_allow_html=True)
     met_totales(df)
@@ -33,6 +29,7 @@ if modo == "Meta Dashboard (API de WhatsApp)":
 
     st.markdown("<h3 style='text-align: center;'>Costo Diario</h3>", unsafe_allow_html=True)
     costo_diario(df)
+
 elif modo == "Listas de distribución":
     df = load_all_lists()
 
@@ -46,6 +43,8 @@ elif modo == "Listas de distribución":
     met_listas_programas(df)
     st.markdown("<h3 style='text-align: center;'>Mensajes por Días</h3>", unsafe_allow_html=True)
     met_listas_dias(df)
+    st.markdown("<h3 style='text-align: center;'>Plantillas más usadas</h3>", unsafe_allow_html=True)
+    graficar_plantillas(df)
     st.markdown("<h3 style='text-align: center;'>Mensajes por Programas y Días</h3>", unsafe_allow_html=True)
     heatmap_programa_fecha(df)
     st.markdown("<h3 style='text-align: center;'>Contactos Únicos por Programa</h3>", unsafe_allow_html=True)

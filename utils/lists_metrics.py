@@ -40,7 +40,7 @@ def met_lists_insights(df: pd.DataFrame):
     dia_top = df["DATE"].value_counts().idxmax()
     col3.metric("Día más activo", dia_top.strftime("%d %b %Y"))
 
-    col4.metric("Contactos únicos", df["PHONE"].nunique())
+    col4.metric("Plantilla más usada", df["TEMPLATE"].mode()[0])
 
 def heatmap_programa_fecha(df: pd.DataFrame):
     df = df[df["STATUS"] == "válido"]
@@ -52,4 +52,11 @@ def contactos_unicos_por_programa(df: pd.DataFrame):
     df = df[df["STATUS"] == "válido"]
     resumen = df.groupby("PROGRAM")["PHONE"].nunique().reset_index(name="Contactos únicos")
     fig = px.bar(resumen, x="PROGRAM", y="Contactos únicos")
+    st.plotly_chart(fig, use_container_width=True)
+
+def graficar_plantillas(df: pd.DataFrame):
+    df = df[(df["STATUS"] == "válido") & (df["TEMPLATE"].notna())]
+    resumen = df["TEMPLATE"].value_counts().reset_index()
+    resumen.columns = ["TEMPLATE", "Cantidad"]
+    fig = px.pie(resumen, names="TEMPLATE", values="Cantidad", hole=0.3)
     st.plotly_chart(fig, use_container_width=True)
