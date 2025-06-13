@@ -46,6 +46,7 @@ def graph_lists_templates(df: pd.DataFrame):
     graph = df["TEMPLATE"].value_counts().reset_index()
     graph.columns = ["TEMPLATE", "Cantidad"]
     fig = px.pie(graph, names="TEMPLATE", values="Cantidad", hole=0.4)
+    fig.update_traces(textinfo='percent+value')
     st.plotly_chart(fig, use_container_width=True)
 
 def graph_lists_program_date(df: pd.DataFrame):
